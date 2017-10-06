@@ -11,7 +11,6 @@ public:
 	~TreeNode();
 	TreeNode<type>* left();
 	TreeNode<type>* right();
-	std::size_t height();
 	void setLeft(TreeNode<type>*);
 	void setRight(TreeNode<type>*);
 	friend std::ostream& operator<< (std::ostream& out, TreeNode& o){

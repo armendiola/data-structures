@@ -1,26 +1,26 @@
 #include <iostream>
 //#include "DoubleLinkedList.h"
-#include "BinaryTree.h"
+#include "AVLTree.h"
 
 int main(){
-	BinaryTree<int> tester = BinaryTree<int>();
+	AVLTree<int> tester = AVLTree<int>();
 	std::cout << tester.height() << std::endl;
 	tester.insert(4);
-	std::cout << tester << std::endl;
+	std::cout << tester.height() << ": " << tester << std::endl;
 	tester.insert(10);
-	std::cout << tester << std::endl;
+	std::cout << tester.height() << ": " << tester << std::endl;
 	tester.insert(9);
-	std::cout << tester << std::endl;
+	std::cout << tester.height() << ": " << tester << std::endl;
 	tester.insert(8);
-	std::cout << tester << std::endl;
+	std::cout << tester.height() << ": " << tester << std::endl;
 	tester.insert(6);
-	std::cout << tester << std::endl;
+	std::cout << tester.height() << ": " << tester << std::endl;
 	tester.insert(5);
-	std::cout << tester << std::endl;
+	std::cout << tester.height() << ": " << tester << std::endl;
 	tester.insert(7);
-	std::cout << tester << std::endl;
+	std::cout << tester.height() << ": " << tester << std::endl;
 	tester.insert(11);
-	std::cout << tester << std::endl;
+	std::cout << tester.height() << ": " << tester << std::endl;
 	tester.insert(2);
 	std::cout << tester.height() << std::endl;
 	std::cout << tester << std::endl;
@@ -29,6 +29,8 @@ int main(){
 	tester.remove(5);
 	std::cout << tester << std::endl;
 	tester.remove(11);
+	std::cout << tester << std::endl;
+	tester.remove(8);
 	std::cout << tester << std::endl;
 
 	/*

@@ -98,10 +98,10 @@ public:
 	iterator<type> end();
 
 	//Capacity functions
-	int height(iterator<type>);
-	int height();
-	int count(iterator<type>);
-	int count();
+	std::size_t height(iterator<type>);
+	std::size_t height();
+	std::size_t count(iterator<type>);
+	std::size_t count();
 	bool empty();
 
 	//Element access
@@ -185,16 +185,16 @@ TreeNode<type>* BinaryTree<type>::at(iterator<type> it){
 }
 
 template<typename type>
-int BinaryTree<type>::height(){
+std::size_t BinaryTree<type>::height(){
 	return height(begin());
 }
 
 template<typename type>
-int BinaryTree<type>::height(iterator<type> it){
+std::size_t BinaryTree<type>::height(iterator<type> it){
 	if (it == end()) return 0;
-	int ret = height(it--);
+	std::size_t ret = height(it--);
 	~it;
-	int comp = height(it++);
+	std::size_t comp = height(it++);
 	~it;
 	if (comp > ret) return comp + 1;
 	return ret + 1;
@@ -220,7 +220,7 @@ TreeNode<type>* BinaryTree<type>::remove(iterator<type> it, TreeNode<type>* n){ 
 		if (!(it->left())) return it->right(); //Case 1, 2
 		if (!(it->right())) return it->left(); //Case 2
 		iterator<type> rep = it + 1;
-		if (!rep->left()){ //Case 3, 4
+		if (!(rep->left())){ //Case 3, 4
 			rep->setLeft(it->left());
 			return rep.operator->();
 		}
@@ -286,9 +286,9 @@ void BinaryTree<type>::swap(BinaryTree<type>& o){
 }
 
 template <typename type>
-int BinaryTree<type>::count(iterator<type> it){
+std::size_t BinaryTree<type>::count(iterator<type> it){
 	if (it == end()) return 0;
-	int ret = count(it++);
+	std::size_t ret = count(it++);
 	~it;
 	ret += count(it--);
 	~it;
@@ -296,7 +296,7 @@ int BinaryTree<type>::count(iterator<type> it){
 }
 
 template <typename type>
-int BinaryTree<type>::count(){
+std::size_t BinaryTree<type>::count(){
 	return count(begin())
 }
 
