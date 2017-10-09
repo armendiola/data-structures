@@ -312,7 +312,7 @@ template <typename type>
 AVLTreeNode<type>* AVLTree<type>::pop_root(){
 	AVLTreeNode<type>* ret = remove(begin(), at(begin()));
 	//TODO
-	return 
+	return ret;
 }
 
 template <typename type>

@@ -25,18 +25,23 @@ protected:
 	AVLTreeNode<type>* leftChild;
 	AVLTreeNode<type>* rightChild;
 	int subBalance;
+	bool modified;
 };
 
 template <typename type>
 AVLTreeNode<type>::AVLTreeNode() : Node(std::numeric_limits<type>::min()){
 	leftChild = nullptr;
 	rightChild = nullptr;
+	subBalance = 0;
+	modified = false;
 }
 
 template <typename type>
 AVLTreeNode<type>::AVLTreeNode(type d) : Node(d){
 	leftChild = nullptr;
 	rightChild = nullptr;
+	subBalance = 0;
+	modified = false;
 }
 
 template <typename type>
@@ -63,19 +68,21 @@ AVLTreeNode<type>* AVLTreeNode<type>::right(){
 
 template <typename type>
 int AVLTreeNode<type>::balance(){
+	if (modified) subBalance = AVLTreeNode::height(rightChild) - AVLTreeNode::height(leftChild);
+	modified = false;
 	return subBalance;
 }
 
 template <typename type>
 void AVLTreeNode<type>::setLeft(AVLTreeNode<type>* n){
 	leftChild = n;
-	subBalance = AVLTreeNode::height(rightChild) - AVLTreeNode::height(leftChild);
+	modified = true;
 }
 
 template <typename type>
 void AVLTreeNode<type>::setRight(AVLTreeNode<type>* n){
 	rightChild = n;
-	subBalance = AVLTreeNode::height(rightChild) - AVLTreeNode::height(leftChild);
+	modified = true;
 }
 
 template <typename type>
