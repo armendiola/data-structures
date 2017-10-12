@@ -9,10 +9,10 @@ public:
 	TreeNode();
 	TreeNode(type);
 	~TreeNode();
-	TreeNode<type>* left();
-	TreeNode<type>* right();
-	void setLeft(TreeNode<type>*);
-	void setRight(TreeNode<type>*);
+	virtual TreeNode<type>* left();
+	virtual TreeNode<type>* right();
+	virtual void setLeft(TreeNode<type>*);
+	virtual void setRight(TreeNode<type>*);
 	friend std::ostream& operator<< (std::ostream& out, TreeNode& o){
 		out << "|" << o.getData() << "|";
 		return out;

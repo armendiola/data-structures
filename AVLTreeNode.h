@@ -3,7 +3,7 @@
 
 template <typename type>
 class AVLTreeNode :
-	public Node<type>
+	public TreeNode<type>
 {
 public:
 	AVLTreeNode();
@@ -14,61 +14,51 @@ public:
 	int balance();
 	void setLeft(AVLTreeNode<type>*);
 	void setRight(AVLTreeNode<type>*);
-	friend std::ostream& operator<< (std::ostream& out, AVLTreeNode& o){
+	/*friend std::ostream& operator<< (std::ostream& out, AVLTreeNode& o){
 		out << "|" << o.getData() << "|";
 		return out;
-	};
+	};*/
 
 	static std::size_t height(AVLTreeNode<type>*);
 
 protected:
-	AVLTreeNode<type>* leftChild;
-	AVLTreeNode<type>* rightChild;
+	//AVLTreeNode<type>* leftChild;
+	//AVLTreeNode<type>* rightChild;
 	int subBalance;
 	bool modified;
 };
 
 template <typename type>
-AVLTreeNode<type>::AVLTreeNode() : Node(std::numeric_limits<type>::min()){
-	leftChild = nullptr;
-	rightChild = nullptr;
+AVLTreeNode<type>::AVLTreeNode() : TreeNode(){
 	subBalance = 0;
 	modified = false;
 }
 
 template <typename type>
-AVLTreeNode<type>::AVLTreeNode(type d) : Node(d){
-	leftChild = nullptr;
-	rightChild = nullptr;
+AVLTreeNode<type>::AVLTreeNode(type d) : TreeNode(d){
 	subBalance = 0;
 	modified = false;
 }
 
 template <typename type>
 AVLTreeNode<type>::~AVLTreeNode(){
-	if (leftChild){
-		leftChild->~AVLTreeNode();
-		leftChild = nullptr;
-	}
-	if (rightChild){
-		rightChild->~AVLTreeNode();
-		rightChild = nullptr;
-	}
+	subBalance = 0;
+	modified = false;
 }
 
 template <typename type>
 AVLTreeNode<type>* AVLTreeNode<type>::left(){
-	return leftChild;
+	return static_cast<AVLTreeNode<type>*>(leftChild);
 }
 
 template <typename type>
 AVLTreeNode<type>* AVLTreeNode<type>::right(){
-	return rightChild;
+	return static_cast<AVLTreeNode<type>*>(rightChild);
 }
 
 template <typename type>
 int AVLTreeNode<type>::balance(){
-	if (modified) subBalance = AVLTreeNode::height(rightChild) - AVLTreeNode::height(leftChild);
+	if (modified) subBalance = AVLTreeNode::height(right()) - AVLTreeNode::height(left());
 	modified = false;
 	return subBalance;
 }
