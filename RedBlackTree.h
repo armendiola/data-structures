@@ -323,11 +323,11 @@ RedBlackTreeNode<type>* RedBlackTree<type>::doubleBlackLeft(iterator<type> it){
 	else{
 		it++;
 		if ((it + 1) == RED || (it - 1) == RED){ //Black Sibling with Red Child Cases
-			if ((it + 1) == BLACK) (~it)->setRight(rotateRight(it));
-			else{
+			if ((it + 1) == RED){
 				it->right()->setColor(BLACK);
 				~it;
 			}
+			else (~it)->setRight(rotateRight(it));
 			it->right()->setColor(it->color());
 			it->setColor(BLACK);
 			ret = rotateLeft(it);
@@ -356,11 +356,11 @@ RedBlackTreeNode<type>* RedBlackTree<type>::doubleBlackRight(iterator<type> it){
 	else{
 		it--;
 		if ((it - 1) == RED || (it + 1) == RED){ //Black Sibling with Red Child Case
-			if ((it - 1) == BLACK) (~it)->setLeft(rotateLeft(it));
-			else{
+			if ((it - 1) == RED){
 				it->left()->setColor(BLACK);
 				~it;
 			}
+			else (~it)->setLeft(rotateLeft(it));
 			it->left()->setColor(it->color());
 			it->setColor(BLACK);
 			ret = rotateRight(it);
