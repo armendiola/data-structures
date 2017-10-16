@@ -251,20 +251,11 @@ AVLTreeNode<type>* AVLTree<type>::remove(iterator<type> it, AVLTreeNode<type>* n
 	if (*n == *it){
 		if (!(it->left())) return it->right(); //Case 1, 2
 		if (!(it->right())) return it->left(); //Case 2
-		iterator<type> rep = it + 1;
-		AVLTreeNode<type>* ret;
-		if (!(rep->left())){ //Case 3, 4
-			rep->setLeft(it->left());
-			ret = rep.operator->();
-		}
-		else {
-			while (rep->left()) rep--; //Case 5
-			~rep;
-			ret = rep->left();
-			rep->setLeft(ret->right());
-			ret->setLeft(it->left());
-			ret->setRight(it->right());
-		}
+		AVLTreeNode<type>* ret = it->right();
+		while (ret->left()) ret = ret->left();
+		(~it)->setRight(remove(it++, ret)); //Case 3, 4, 5
+		ret->setLeft(it->left());
+		ret->setRight(it->right());
 		if (ret->balance() < -1){
 			if (ret->left()->balance() > 0) ret->setLeft(rotateLeft(iterator<type>(ret->left()))); //Double Rotation Case
 			return rotateRight(iterator<type>(ret)); //Rotation Cases

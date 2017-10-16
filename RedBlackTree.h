@@ -58,6 +58,10 @@ public:
 		if (!o.operator->() || !node) return !o.operator->() && !node;
 		return *(node) == *(o);
 	}
+	bool operator== (const Color& o) const{
+		if (!node) return false;
+		return node->color() == o;
+	}
 	bool operator< (const iterator<type>& o) const{
 		if (!o.operator->() || !node) return !o.operator->() && node;
 		return *(node) < *(o);
@@ -122,6 +126,8 @@ public:
 	RedBlackTreeNode<type>* pop_root();
 	RedBlackTreeNode<type>* rotateRight(iterator<type>);
 	RedBlackTreeNode<type>* rotateLeft(iterator<type>);
+	RedBlackTreeNode<type>* doubleBlackLeft(iterator<type>);
+	RedBlackTreeNode<type>* doubleBlackRight(iterator<type>);
 	void copy(RedBlackTree<type>*);
 	void unique(iterator<type>);
 	void unique();
@@ -230,10 +236,10 @@ RedBlackTreeNode<type>* RedBlackTree<type>::insert(iterator<type> it, RedBlackTr
 	if (it == end()) return n;
 	if (*n < *it){
 		(~it)->setLeft(insert(it--, n));
-		if (it->left()->color() == DOUBLE_RED){ //Double Red Violation Cases
+		if ((it - 1) == DOUBLE_RED){ //Double Red Violation Cases
 			it->left()->setColor(BLACK);
 			it->setColor(RED);
-			if (it->right()->color() == RED) it->right()->setColor(BLACK); //Color Flip Cases
+			if ((it + 1) == RED) it->right()->setColor(BLACK); //Color Flip Cases
 			else{
 				if (!(*n < *(it->left()))){ //Double Rotation Case
 					it->left()->setColor(RED);
@@ -247,17 +253,17 @@ RedBlackTreeNode<type>* RedBlackTree<type>::insert(iterator<type> it, RedBlackTr
 	}
 	else{
 		(~it)->setRight(insert(it++, n));
-		if (it->right()->color() == DOUBLE_RED){ //Double Red Violation Cases
+		if ((it + 1) == DOUBLE_RED){ //Double Red Violation Cases
 			it->right()->setColor(BLACK);
 			it->setColor(RED);
-			if (it->left()->color() == RED) it->left()->setColor(BLACK); //Color Flip Case
+			if ((it - 1) == RED) it->left()->setColor(BLACK); //Color Flip Case
 			else{
 				if (*n < *(it->right())){ //Double Rotation Case
 					it->right()->setColor(RED);
 					it->right()->left()->setColor(BLACK);
-					(~it)->setRight(rotateLeft(it++));
+					(~it)->setRight(rotateRight(it++));
 				}
-				return rotateRight(it); //Rotation Cases
+				return rotateLeft(it); //Rotation Cases
 			}
 		}
 		else if (it->color() && it->right()->color()) it->setColor(DOUBLE_RED); //Double Red Violation Trigger
@@ -269,43 +275,106 @@ template <typename type>
 RedBlackTreeNode<type>* RedBlackTree<type>::remove(iterator<type> it, RedBlackTreeNode<type>* n){ //TODO improve simplicity, make more elagant if possible
 	if (it == end()) return nullptr;
 	if (*n == *it){
-		if (!(it->left())) return it->right(); //Case 1, 2
-		if (!(it->right())) return it->left(); //Case 2
-		iterator<type> rep = it + 1;
-		RedBlackTreeNode<type>* ret;
-		if (!(rep->left())){ //Case 3, 4
-			rep->setLeft(it->left());
-			ret = rep.operator->();
+		if (!(it->left())){
+			if (it == RED || (it + 1) == RED){ //Half Node and Red Leaf Node Cases
+				if(it->right()) it->right()->setColor(BLACK);
+				return it->right();
+			}
+			else{ //Black Leaf Node Case
+				RedBlackTreeNode<type>* ret = new RedBlackTreeNode<type>();
+				ret->setColor(DOUBLE_BLACK);
+				return ret;
+			}
 		}
-		else {
-			while (rep->left()) rep--; //Case 5
-			~rep;
-			ret = rep->left();
-			rep->setLeft(ret->right());
-			ret->setLeft(it->left());
-			ret->setRight(it->right());
+		if (!(it->right())){
+			if (it == RED || (it - 1) == RED){ //Half Node Case
+				it->left()->setColor(BLACK);
+				return it->left();
+			}
 		}
-		if (ret->balance() < -1){
-			if (ret->left()->balance() > 0) ret->setLeft(rotateLeft(iterator<type>(ret->left())));
-			return rotateRight(iterator<type>(ret));
-		}
+		RedBlackTreeNode<type>* ret = it->right();
+		while (ret->left()) ret = ret->left();
+		(~it)->setRight(remove(it++, ret)); //Case 3, 4, 5
+		ret->setLeft(it->left());
+		ret->setRight(it->right());
+		ret->setColor(it->color());
 		return ret;
 	}
 	if (*n < *it){
 		(~it)->setLeft(remove(it--, n));
-		if (it->balance() > 1){
-			if ((it + 1)->balance() < 0) (~it)->setRight(rotateRight(it++));
-			return rotateLeft(it);
-		}
+		if ((it - 1) == DOUBLE_BLACK) return doubleBlackLeft(it);
 	}
 	else{
 		(~it)->setRight(remove(it++, n));
-		if (it->balance() < -1){
-			if ((it - 1)->balance() > 0) (~it)->setLeft(rotateLeft(it--));
-			return rotateRight(it);
-		}
+		if ((it + 1) == DOUBLE_BLACK) return doubleBlackRight(it);
 	}
 	return it.operator->();
+}
+
+template <typename type>
+RedBlackTreeNode<type>* RedBlackTree<type>::doubleBlackLeft(iterator<type> it){
+	RedBlackTreeNode<type>* ret = it.operator->();
+	if ((it + 1) == RED){ //Red Sibling Case
+		it->right()->setColor(BLACK);
+		it->setColor(RED);
+		ret = rotateLeft(it);
+		ret->setLeft(doubleBlackLeft(it)); //Search for better way to down propogate
+	}
+	else{
+		it++;
+		if ((it + 1) == RED || (it - 1) == RED){ //Black Sibling with Red Child Cases
+			if ((it + 1) == BLACK) (~it)->setRight(rotateRight(it));
+			else{
+				it->right()->setColor(BLACK);
+				~it;
+			}
+			it->right()->setColor(it->color());
+			it->setColor(BLACK);
+			ret = rotateLeft(it);
+		}
+		else{ //Black Sibling without Red Child Case
+			~it;
+			it->right()->setColor(RED);
+			if (it == RED) it->setColor(BLACK);
+			else it->setColor(DOUBLE_BLACK);
+		}
+		it->left()->setColor(BLACK);
+		if (*(it->left()) == RedBlackTreeNode<type>()) it->setLeft(nullptr);
+	}
+	return ret;
+}
+
+template <typename type>
+RedBlackTreeNode<type>* RedBlackTree<type>::doubleBlackRight(iterator<type> it){
+	RedBlackTreeNode<type>* ret = it.operator->();
+	if ((it - 1) == RED){ //Red Sibling Case
+		it->left()->setColor(BLACK);
+		it->setColor(RED);
+		ret = rotateRight(it);
+		ret->setRight(doubleBlackRight(it)); //Search for better way to down propogate
+	}
+	else{
+		it--;
+		if ((it - 1) == RED || (it + 1) == RED){ //Black Sibling with Red Child Case
+			if ((it - 1) == BLACK) (~it)->setLeft(rotateLeft(it));
+			else{
+				it->left()->setColor(BLACK);
+				~it;
+			}
+			it->left()->setColor(it->color());
+			it->setColor(BLACK);
+			ret = rotateRight(it);
+		}
+		else{ //Black Sibling without Red Child Case
+			~it;
+			it->left()->setColor(RED);
+			if (it == RED) it->setColor(BLACK);
+			else it->setColor(DOUBLE_BLACK);
+		}
+		it->right()->setColor(BLACK);
+		if (*(it->right()) == RedBlackTreeNode<type>()) it->setRight(nullptr);
+	}
+	return ret;
 }
 
 template <typename type>
@@ -321,7 +390,8 @@ void RedBlackTree<type>::insert(type d){
 
 template <typename type>
 void RedBlackTree<type>::remove(RedBlackTreeNode<type>* n){
-	remove(before_begin(), n);
+	rootNode->setRight(remove(begin(), n));
+	rootNode->right()->setColor(BLACK);
 }
 
 template <typename type>

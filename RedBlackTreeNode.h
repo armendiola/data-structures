@@ -14,9 +14,12 @@ class RedBlackTreeNode :
 {
 public:
 	RedBlackTreeNode();
+	RedBlackTreeNode(type);
 	~RedBlackTreeNode();
 	RedBlackTreeNode<type>* left();
 	RedBlackTreeNode<type>* right();
+	void setLeft(RedBlackTreeNode<type>*);
+	void setRight(RedBlackTreeNode<type>*);
 	Color color();
 	void setColor(Color);
 	void flip();
@@ -54,13 +57,11 @@ RedBlackTreeNode<type>* RedBlackTreeNode<type>::right(){
 template <typename type>
 void RedBlackTreeNode<type>::setLeft(RedBlackTreeNode<type>* n){
 	leftChild = n;
-	modified = true;
 }
 
 template <typename type>
 void RedBlackTreeNode<type>::setRight(RedBlackTreeNode<type>* n){
 	rightChild = n;
-	modified = true;
 }
 
 template <typename type>
@@ -74,6 +75,6 @@ void RedBlackTreeNode<type>::setColor(Color c){
 }
 
 template <typename type>
-Color RedBlackTreeNode<type>::flip(){
+void RedBlackTreeNode<type>::flip(){
 	nodeColor = (nodeColor + 1) % 2;
 }
